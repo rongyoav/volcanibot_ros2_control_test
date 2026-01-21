@@ -747,7 +747,7 @@ public:
         motorL.set_ki(100);
         motorL.set_kp(500);
         motorL.set_kf(1000);
-        motorL.max_speed(80);
+        motorL.max_speed(250);
         motorL.set_feedforward_output_smoothing(100);
         motorL.set_vel_smoothing(1000);
 
@@ -759,7 +759,7 @@ public:
         motorR.set_ki(100);
         motorR.set_kp(500);
         motorR.set_kf(1000);
-        motorR.max_speed(80);
+        motorR.max_speed(250);
         motorR.set_feedforward_output_smoothing(100);
         motorR.set_vel_smoothing(1000);
 

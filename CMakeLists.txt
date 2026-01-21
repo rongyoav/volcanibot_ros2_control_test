@@ -19,6 +19,10 @@ foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
 endforeach()
 
+# Find libserial
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(LIBSERIAL REQUIRED libserial)
+
 ## COMPILE
 add_library(
   diffdrive_ros2_control
@@ -30,12 +34,14 @@ target_include_directories(diffdrive_ros2_control PUBLIC
 $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
 $<INSTALL_INTERFACE:include/diffdrive_ros2_control>
 )
+target_include_directories(diffdrive_ros2_control PUBLIC ${LIBSERIAL_INCLUDE_DIRS})
 ament_target_dependencies(
   diffdrive_ros2_control PUBLIC
   ${THIS_PACKAGE_INCLUDE_DEPENDS}
 )
 
-target_link_libraries(diffdrive_ros2_control PUBLIC serial)
+target_link_libraries(diffdrive_ros2_control PUBLIC ${LIBSERIAL_LIBRARIES})
+target_compile_options(diffdrive_ros2_control PUBLIC ${LIBSERIAL_CFLAGS_OTHER})
 
 # Causes the visibility macros to use dllexport rather than dllimport,
 # which is appropriate when building the dll but not consuming it.
@@ -56,6 +62,10 @@ install(
 install(
   DIRECTORY bringup/launch bringup/config
   DESTINATION share/diffdrive_ros2_control
+)
+install(
+  PROGRAMS scripts/cmd_vel_converter.py
+  DESTINATION lib/diffdrive_ros2_control
 )
 install(TARGETS diffdrive_ros2_control
   EXPORT export_diffdrive_ros2_control

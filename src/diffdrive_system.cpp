@@ -110,6 +110,7 @@ namespace diffdrive_ros2_control
         info_.joints[0].name, hardware_interface::HW_IF_VELOCITY, &left_encoder_rpm_));
     state_interfaces.emplace_back(hardware_interface::StateInterface(
         info_.joints[1].name, hardware_interface::HW_IF_POSITION, &right_hw_positions_));
+    // Note: right_encoder_rpm_ is negated in read() to match inverted command
     state_interfaces.emplace_back(hardware_interface::StateInterface(
         info_.joints[1].name, hardware_interface::HW_IF_VELOCITY, &right_encoder_rpm_));
 
@@ -198,6 +199,10 @@ namespace diffdrive_ros2_control
     // get rpm from motor
     bool success = comm_->ReadRPM(left_encoder_rpm_, right_encoder_rpm_);
 
+    // Negate both wheel encoders to match inverted command directions
+    left_encoder_rpm_ = -left_encoder_rpm_;
+    right_encoder_rpm_ = -right_encoder_rpm_;
+
     // calc
     left_hw_positions_ = left_hw_positions_ + period.seconds() * left_encoder_rpm_;
     right_hw_positions_ = right_hw_positions_ + period.seconds() * right_encoder_rpm_;
@@ -223,7 +228,7 @@ namespace diffdrive_ros2_control
       return hardware_interface::return_type::ERROR;
     }
 
-    comm_->DriveCommand(left_wheel_cmd_rpm_, right_wheel_cmd_rpm_);
+    comm_->DriveCommand(-left_wheel_cmd_rpm_, right_wheel_cmd_rpm_);
 
     // RCLCPP_INFO(
     //     rclcpp::get_logger("DiffDriveSystemHardware"), "Got command %.5f for '%s'!", left_wheel_cmd_rpm_,

@@ -81,11 +81,20 @@ def generate_launch_description():
         )
     )
 
+    # CmdVel converter node (Twist -> TwistStamped)
+    cmd_vel_converter = Node(
+        package="diffdrive_ros2_control",
+        executable="cmd_vel_converter.py",
+        name="cmd_vel_converter",
+        output="screen",
+    )
+
     nodes = [
         control_node,
         robot_state_pub_node,
         joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
+        cmd_vel_converter,
     ]
 
     return LaunchDescription(declared_arguments + nodes)
